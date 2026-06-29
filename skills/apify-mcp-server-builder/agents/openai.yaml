@@ -1,0 +1,7 @@
+interface:
+  display_name: "Apify MCP Builder"
+  short_description: "Build Apify MCP server Actors"
+  default_prompt: "Use $apify-mcp-server-builder to build or review this Apify MCP server Actor."
+
+policy:
+  allow_implicit_invocation: true
