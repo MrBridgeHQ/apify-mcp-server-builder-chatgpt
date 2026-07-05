@@ -1,4 +1,4 @@
-# Path C — Building an MCP Server Actor from Scratch
+# Path C - Building an MCP Server Actor from Scratch
 
 The full reference for building an MCP server Actor on Apify when no existing MCP server or OpenAPI spec covers your tools. Covers Node and Python in parallel.
 
@@ -13,7 +13,7 @@ my-mcp-server/
 ├── .actor/
 │   ├── actor.json
 │   ├── pay_per_event.json
-│   ├── input_schema.json        # optional — Standby Actors don't need batch input
+│   ├── input_schema.json        # optional - Standby Actors don't need batch input
 │   └── Dockerfile
 ├── src/
 │   ├── main.ts                  # Actor.init() + Express + MCP server bootstrap
@@ -58,7 +58,7 @@ my-mcp-server/
 └── README.md
 ```
 
-## `.actor/actor.json` — full example
+## `.actor/actor.json` - full example
 
 ```json
 {
@@ -87,13 +87,13 @@ my-mcp-server/
 ```
 
 Notes:
-- `timeoutSecs: 0` means no timeout — the Standby container shuts down via idle timeout, not run timeout. **Required for MCP.** A non-zero `timeoutSecs` will kill the container mid-session.
+- `timeoutSecs: 0` means no timeout - the Standby container shuts down via idle timeout, not run timeout. **Required for MCP.** A non-zero `timeoutSecs` will kill the container mid-session.
 - `dataset_schema.json` is optional for MCP servers; some Actors push billing/audit events to the default dataset and benefit from typing it. If you don't, omit `storages`.
-- `input_schema.json` is optional but recommended — even if Standby doesn't need batch input, users running the Actor in normal mode (e.g. for debugging) appreciate a clean input form. Keep it minimal: a debug flag, optional auth tokens for third-party APIs.
+- `input_schema.json` is optional but recommended - even if Standby doesn't need batch input, users running the Actor in normal mode (e.g. for debugging) appreciate a clean input form. Keep it minimal: a debug flag, optional auth tokens for third-party APIs.
 
-## `.actor/pay_per_event.json` — full example
+## `.actor/pay_per_event.json` - full example
 
-The shape is a flat object keyed by event name. Each event declares `eventTitle`, `eventDescription`, and `eventPriceUsd`. Do NOT declare `apify-actor-start` here — it is platform-managed.
+The shape is a flat object keyed by event name. Each event declares `eventTitle`, `eventDescription`, and `eventPriceUsd`. Do NOT declare `apify-actor-start` here - it is platform-managed.
 
 ```json
 {
@@ -107,7 +107,7 @@ The shape is a flat object keyed by event name. Each event declares `eventTitle`
 
 For multi-tool servers, see the three taxonomy patterns (flat, per-tool tiered, per-result) in a dedicated Apify monetization guide (§ "Pricing structure for MCP").
 
-**Price point for first-time publishers:** $0.001–$0.01 per tool call is the empirical range for read-only lookups; $0.02–$0.10 for AI-LLM-backed tools. Start at the low end during the 30-day calibration window, then raise (a 14-day delay applies to price increases on the Store). **Do not guess a price** — consult a dedicated Apify pricing-strategy guide before publishing to the Store.
+**Price point for first-time publishers:** $0.001–$0.01 per tool call is the empirical range for read-only lookups; $0.02–$0.10 for AI-LLM-backed tools. Start at the low end during the 30-day calibration window, then raise (a 14-day delay applies to price increases on the Store). **Do not guess a price** - consult a dedicated Apify pricing-strategy guide before publishing to the Store.
 
 ## `.actor/Dockerfile`
 
@@ -177,7 +177,7 @@ httpx>=0.27.0
 
 `mcp` is the official Anthropic MCP package; `FastMCP` is the high-level decorator API inside it.
 
-## `src/main.ts` — full Node example
+## `src/main.ts` - full Node example
 
 > **API choice:** this reference uses the **low-level `Server` API** from `@modelcontextprotocol/sdk/server/index.js` with explicit `setRequestHandler(CallToolRequestSchema, …)` / `setRequestHandler(ListToolsRequestSchema, …)`. This gives full control over the JSON-RPC envelope, supports middleware patterns (charging wrappers, request logging), and makes multi-tool routing explicit. The main `SKILL.md` skeleton uses the **high-level `McpServer` API** (`mcp.tool(name, desc, schema, handler)`) which wraps the same primitives and is shorter for simple servers. Both are first-party SDK APIs. Don't mix them in the same Actor.
 
@@ -216,7 +216,7 @@ app.post('/mcp', async (req, res) => {
 });
 
 // Health check at GET /
-// Apify does NOT require a specific health-probe path — Standby readiness is determined
+// Apify does NOT require a specific health-probe path - Standby readiness is determined
 // by the container binding to ACTOR_WEB_SERVER_PORT successfully. The GET / handler below
 // is OPTIONAL: it (a) gives a clean response when users hit the bare Standby URL in a browser,
 // and (b) confirms the server is alive without invoking MCP. Strongly recommended; not required.
@@ -229,15 +229,15 @@ app.listen(port, () => {
   log.info(`MCP server listening on port ${port}`);
 });
 
-// Do NOT call Actor.exit() — Standby owns the lifecycle.
+// Do NOT call Actor.exit() - Standby owns the lifecycle.
 // Graceful shutdown on SIGTERM (Apify sends this on idle timeout):
 process.on('SIGTERM', async () => {
-  log.info('SIGTERM received — shutting down');
+  log.info('SIGTERM received - shutting down');
   await Actor.exit();
 });
 ```
 
-## `src/server.ts` — tool registration
+## `src/server.ts` - tool registration
 
 ```typescript
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -287,7 +287,7 @@ export function registerTools(mcp: Server) {
 }
 ```
 
-## `src/tools/githubStars.ts` — tool implementation
+## `src/tools/githubStars.ts` - tool implementation
 
 ```typescript
 export async function getGithubRepoStars(input: { owner: string; repo: string }) {
@@ -304,7 +304,7 @@ export async function getGithubRepoStars(input: { owner: string; repo: string })
 }
 ```
 
-## `src/ppe/charge.ts` — PPE wrapper
+## `src/ppe/charge.ts` - PPE wrapper
 
 ```typescript
 import { Actor, log } from 'apify';
@@ -327,7 +327,7 @@ export async function chargeEvent(opts: { eventName: string; count?: number }): 
 
 All charging in the Actor goes through this helper. New code can't bypass the rules accidentally. For the full PPE doctrine, consult a dedicated Apify monetization guide.
 
-## `src/utils/errors.ts` — MCP error envelope
+## `src/utils/errors.ts` - MCP error envelope
 
 ```typescript
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
@@ -343,7 +343,7 @@ export function mcpError(message: string): CallToolResult {
 
 The `isError: true` flag is part of the MCP spec. Clients use it to distinguish a successful "no results" answer from a failed call. **Never charge on `isError: true`.**
 
-## Python equivalent — `src/main.py`
+## Python equivalent - `src/main.py`
 
 ```python
 import asyncio
@@ -386,7 +386,7 @@ if __name__ == '__main__':
     asyncio.run(main())
 ```
 
-## Python — `src/ppe/charge.py`
+## Python - `src/ppe/charge.py`
 
 ```python
 from apify import Actor
@@ -406,7 +406,7 @@ async def charge_event(event_name: str, count: int = 1) -> bool:
     return True
 ```
 
-## Python — `src/tools/github_stars.py`
+## Python - `src/tools/github_stars.py`
 
 ```python
 import httpx
@@ -471,7 +471,7 @@ Don't block `Actor.init()` on cache prefetches. Fire-and-forget:
 
 ```typescript
 await Actor.init();
-prewarmCachesInBackground();  // no await — runs while server is already listening
+prewarmCachesInBackground();  // no await - runs while server is already listening
 app.listen(port);
 ```
 
@@ -490,7 +490,7 @@ The Streamable HTTP transport supports two modes:
 | Mode | When | Apify trade-off |
 |---|---|---|
 | **Stateless** (`sessionIdGenerator: undefined`) | Each request is independent. Recommended default. | Simpler; survives Apify load-balancing across multiple Standby containers. |
-| **Stateful** (`sessionIdGenerator: () => randomUUID()`) | The server holds session memory (e.g. running conversation context, large datasets in memory). | Requires session affinity — Apify Standby may rebalance and break in-memory sessions. Use only with external state (KV Store, Redis). |
+| **Stateful** (`sessionIdGenerator: () => randomUUID()`) | The server holds session memory (e.g. running conversation context, large datasets in memory). | Requires session affinity - Apify Standby may rebalance and break in-memory sessions. Use only with external state (KV Store, Redis). |
 
 For the vast majority of MCP servers (per-tool-call lookups), stateless is correct. Stateful is for agent-style MCPs that maintain conversational state.
 

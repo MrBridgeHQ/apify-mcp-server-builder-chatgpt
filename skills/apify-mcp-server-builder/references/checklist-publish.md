@@ -1,15 +1,15 @@
-# Publish Checklist — MCP Server Actor
+# Publish Checklist - MCP Server Actor
 
 Pre-publish + post-deploy verification for an MCP server Actor on the Apify Store. Run this checklist every time before `apify push` to production, and again after deployment.
 
 This file complements (does not replace):
-- a dedicated Apify Actor content guide — README + Store description checklist
-- a dedicated Apify monetization guide — full revenue/billing audit
-- a graceful-exit / error-handling guide — graceful-exit checklist
+- a dedicated Apify Actor content guide - README + Store description checklist
+- a dedicated Apify monetization guide - full revenue/billing audit
+- a graceful-exit / error-handling guide - graceful-exit checklist
 
 This checklist focuses on the **MCP-server-specific** items.
 
-## Pre-publish — code review
+## Pre-publish - code review
 
 ### Standby configuration
 
@@ -17,7 +17,7 @@ This checklist focuses on the **MCP-server-specific** items.
 - [ ] `.actor/actor.json` has `webServerMcpPath` set to the actual transport path (`/mcp` for Streamable HTTP, `/sse` for Legacy SSE)
 - [ ] `.actor/actor.json` has `webServerIdleTimeoutSecs` explicitly set (default to 300 unless usage data says otherwise)
 - [ ] `.actor/actor.json` has `minMemoryMbytes` and `maxMemoryMbytes` set tight (256–512 for Node, 512–1024 for Python with heavy deps)
-- [ ] `.actor/actor.json` has `defaultRunOptions.timeoutSecs: 0` (no run timeout — Standby idle owns the lifecycle)
+- [ ] `.actor/actor.json` has `defaultRunOptions.timeoutSecs: 0` (no run timeout - Standby idle owns the lifecycle)
 
 ### Server bootstrap
 
@@ -42,7 +42,7 @@ This checklist focuses on the **MCP-server-specific** items.
 - [ ] `.actor/pay_per_event.json` declares every event your code charges
 - [ ] Every `Actor.charge()` call is after the successful work completes and before the response is returned
 - [ ] No `Actor.charge()` inside catch blocks or error paths
-- [ ] No `Actor.charge()` for `apify-actor-start` or `apify-default-dataset-item` (synthetic — platform-managed)
+- [ ] No `Actor.charge()` for `apify-actor-start` or `apify-default-dataset-item` (synthetic - platform-managed)
 - [ ] Every `Actor.charge()` result is checked for `eventChargeLimitReached`; the response branch clearly communicates the cap-hit to the user
 - [ ] Free tools (e.g. `list_resources`, `describe_tool`) are explicitly excluded from charging
 
@@ -57,7 +57,7 @@ This checklist focuses on the **MCP-server-specific** items.
 
 - [ ] `@modelcontextprotocol/sdk` (Node) or `mcp` (Python) is at the latest stable
 - [ ] `apify` SDK at latest stable
-- [ ] No unused heavy dependencies (Playwright, Puppeteer, ML libs) — they multiply cold-start time
+- [ ] No unused heavy dependencies (Playwright, Puppeteer, ML libs) - they multiply cold-start time
 - [ ] Lazy imports for any optional heavy library (see `path-c-fromscratch.md` § "Cold start mitigation")
 
 ### Source-file confidentiality
@@ -74,7 +74,7 @@ This checklist focuses on the **MCP-server-specific** items.
 
 - [ ] All public URLs in README, Store description, and public docs resolve and are correct
 
-## Pre-publish — local test
+## Pre-publish - local test
 
 ```bash
 APIFY_META_ORIGIN="STANDBY" ACTOR_WEB_SERVER_PORT=8080 apify run -p
@@ -100,7 +100,7 @@ apify push
 - [ ] Build log mentions the correct base image
 - [ ] No warnings about missing files in the build
 
-## Post-deploy — verification
+## Post-deploy - verification
 
 ### Apify Console
 
@@ -163,7 +163,7 @@ Pick a real MCP client (Claude Desktop, Claude Code, Cursor, ChatGPT MCP). Confi
 - [ ] Pricing has been audited per a dedicated Apify monetization guide
 - [ ] All public URLs resolve and are correct
 - [ ] Discounts (Bronze/Silver/Gold) opt-in is enabled in the Monetization wizard
-- [ ] You've tested via [`apify/tester-mcp-client`](https://apify.com/jiri.spilka/tester-mcp-client) — Apify's official MCP client tester Actor
+- [ ] You've tested via [`apify/tester-mcp-client`](https://apify.com/jiri.spilka/tester-mcp-client) - Apify's official MCP client tester Actor
 
 ## After 7 days in the Store
 
@@ -171,9 +171,9 @@ Pick a real MCP client (Claude Desktop, Claude Code, Cursor, ChatGPT MCP). Confi
 - [ ] **Insights → Cold-start frequency** acceptable for your audience (tune `webServerIdleTimeoutSecs` if not)
 - [ ] **Insights → Idle compute %** ≤ 20% of revenue (if higher, consult a dedicated Apify monetization guide § "Standby-specific cost concerns")
 - [ ] No unaddressed user reports in **Issues** tab
-- [ ] First reviews appearing in **Reviews** tab — respond to constructive feedback within 48h
+- [ ] First reviews appearing in **Reviews** tab - respond to constructive feedback within 48h
 
-## Iron rules — do not skip
+## Iron rules - do not skip
 
 If any of these fail, **delete the deployment** and fix before re-publishing:
 

@@ -1,4 +1,4 @@
-# MCP Transports — Choosing the Right One on Apify
+# MCP Transports - Choosing the Right One on Apify
 
 Apify Standby supports three MCP transport options. The choice cascades into your client config, your `webServerMcpPath`, and (sometimes) compatibility with end-user MCP clients. This file is the canonical reference.
 
@@ -10,14 +10,14 @@ Apify Standby supports three MCP transport options. The choice cascades into you
 | **Legacy SSE** | Deprecated in spec, still supported | `/sse` | Only if a target client cannot do Streamable HTTP |
 | **stdio** | Local-only by spec | N/A | Only inside Path A's proxy (Apify converts to HTTP) |
 
-## Streamable HTTP — the default
+## Streamable HTTP - the default
 
 **Use this unless you have a specific reason not to.**
 
 - Single HTTP endpoint, typically `POST /mcp`.
 - The server may upgrade the response to a stream (chunked transfer or SSE-style) for long-running tool calls and notifications.
 - Stateless-friendly: no session state required server-side for the common per-tool-call pattern.
-- Compatible with Apify's load balancer — multiple Standby containers can serve requests interchangeably.
+- Compatible with Apify's load balancer - multiple Standby containers can serve requests interchangeably.
 
 ### Server-side setup (Node)
 
@@ -61,7 +61,7 @@ await mcp.run_streamable_http_async(host='0.0.0.0', port=port, path='/mcp')
 }
 ```
 
-## Legacy SSE — fallback only
+## Legacy SSE - fallback only
 
 Some older MCP clients (and a handful of recent ones with slow update cycles) only support the deprecated SSE transport. Use this **only** when you've confirmed a target client requires it.
 
@@ -94,7 +94,7 @@ app.post('/messages', (req, res) => {
 
 The `webServerMcpPath` field tells Apify's MCP discovery (and any "Try this MCP server" UI in the Console) where to look. If you serve SSE at a different path, set this accordingly.
 
-## stdio — only inside Path A proxies
+## stdio - only inside Path A proxies
 
 A pure stdio MCP server cannot be deployed directly to Apify. Apify exposes HTTPS, not stdio. **However**, Path A's `ts-mcp-proxy` template can launch a stdio MCP server as a child process and translate its messages to Streamable HTTP:
 
@@ -104,7 +104,7 @@ const MCP_COMMAND = ['npx', '@modelcontextprotocol/server-everything'];
 const MCP_COMMAND = ['python', '-m', 'my_stdio_mcp_module'];
 ```
 
-The proxy spawns the child, reads/writes its stdin/stdout, and exposes the conversation over HTTP. From the deployed Actor's perspective, the transport is still Streamable HTTP — the stdio is internal.
+The proxy spawns the child, reads/writes its stdin/stdout, and exposes the conversation over HTTP. From the deployed Actor's perspective, the transport is still Streamable HTTP - the stdio is internal.
 
 See `path-a-proxy.md` for the full pattern.
 
@@ -129,7 +129,7 @@ See `path-a-proxy.md` for the full pattern.
 
 If you're building a new MCP server from scratch with no specific client constraints, **always Streamable HTTP.**
 
-## MCP Inspector — the universal testing client
+## MCP Inspector - the universal testing client
 
 `@modelcontextprotocol/inspector` (run via `npx @modelcontextprotocol/inspector`) is the official MCP testing UI. It speaks all three transports.
 
@@ -152,7 +152,7 @@ Transport: Streamable HTTP
 Headers: { "Authorization": "Bearer <APIFY_API_TOKEN>" }
 ```
 
-Inspector shows the raw JSON-RPC frames in both directions — invaluable for debugging tool registration, schema mismatches, and charge logging.
+Inspector shows the raw JSON-RPC frames in both directions - invaluable for debugging tool registration, schema mismatches, and charge logging.
 
 ## Mixing transports
 
@@ -167,7 +167,7 @@ app.get('/sse', async (req, res) => { /* SSE transport */ });
 app.post('/messages', (req, res) => { /* SSE incoming messages */ });
 ```
 
-But `webServerMcpPath` is a single value. Set it to your **primary** transport path (`/mcp`). The other transport is reachable by direct URL but won't be auto-discovered by Apify's MCP-aware tooling. This is rarely needed in practice — pick one transport.
+But `webServerMcpPath` is a single value. Set it to your **primary** transport path (`/mcp`). The other transport is reachable by direct URL but won't be auto-discovered by Apify's MCP-aware tooling. This is rarely needed in practice - pick one transport.
 
 ## Common transport mistakes
 

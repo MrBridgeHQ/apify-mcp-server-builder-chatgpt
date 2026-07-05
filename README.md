@@ -1,4 +1,4 @@
-# apify-mcp-server-builder — ChatGPT / Codex Agent Skill
+# apify-mcp-server-builder - ChatGPT / Codex Agent Skill
 
 An Agent Skill **for ChatGPT (OpenAI Codex)**. **Target LLM: ChatGPT / Codex.**
 

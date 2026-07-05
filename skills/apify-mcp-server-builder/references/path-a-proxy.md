@@ -1,4 +1,4 @@
-# Path A — Proxy an Existing MCP Server
+# Path A - Proxy an Existing MCP Server
 
 Use Path A when an MCP server already exists (yours, open-source, or third-party) and you only need Apify to **host it + bill for tool calls**. This is the fastest path to a monetized Apify MCP server when the tool logic is already implemented elsewhere.
 
@@ -9,7 +9,7 @@ This file assumes you've read the main `SKILL.md`. It expands Path A specifics.
 - ✅ You found a community MCP server (e.g. `@modelcontextprotocol/server-everything`, `mcp-server-filesystem`, vendor-published MCP servers) and want to host + monetize it.
 - ✅ You have your own MCP server running stdio or remote HTTP that you want to publish on the Apify Store.
 - ✅ You want to combine multiple existing MCP servers behind one endpoint (rare; usually handled with a custom Path C implementation).
-- ❌ You need tool-call-level transformations of the upstream server's responses (use Path C instead — proxying makes it harder to insert logic per tool).
+- ❌ You need tool-call-level transformations of the upstream server's responses (use Path C instead - proxying makes it harder to insert logic per tool).
 - ❌ The upstream MCP server is unreliable and you want to add retries/caching (Path C lets you wrap each tool individually).
 
 ## Setup
@@ -28,7 +28,7 @@ my-mcp-server/
 │   ├── pay_per_event.json   # Pre-configured with tool-request event
 │   └── Dockerfile
 ├── src/
-│   └── main.ts              # Proxy bootstrap — edit MCP_COMMAND here
+│   └── main.ts              # Proxy bootstrap - edit MCP_COMMAND here
 ├── package.json
 └── README.md
 ```
@@ -56,7 +56,7 @@ const MCP_COMMAND = [
 ];
 ```
 
-You'll need a base image that has Python (or install Python in the Dockerfile). Since the proxy itself is Node, this dual-runtime setup is heavier than Path C in Python — consider Path C unless you specifically need to wrap an existing Python stdio MCP server.
+You'll need a base image that has Python (or install Python in the Dockerfile). Since the proxy itself is Node, this dual-runtime setup is heavier than Path C in Python - consider Path C unless you specifically need to wrap an existing Python stdio MCP server.
 
 ### Wrap a remote HTTP MCP server
 
@@ -69,7 +69,7 @@ const MCP_COMMAND = [
 ];
 ```
 
-The `mcp-remote` npm package is a stdio-to-HTTP adapter — it lets your Apify proxy speak stdio internally while connecting to a remote HTTPS MCP server.
+The `mcp-remote` npm package is a stdio-to-HTTP adapter - it lets your Apify proxy speak stdio internally while connecting to a remote HTTPS MCP server.
 
 **Note on the upstream token:** never hardcode it in `actor.json` or `main.ts`. Set it as an environment variable in the Apify Console (Actor settings → Environment variables → secret). Then reference it:
 
@@ -83,7 +83,7 @@ const MCP_COMMAND = [
 ];
 ```
 
-For tokens that should come from the *end user* (each Apify user passes their own upstream credentials), use Actor input fields — but be aware that Standby Actors don't have batch input. You can read input via query parameters or the MCP `arguments` of each tool call. See the "User-supplied upstream credentials" section below.
+For tokens that should come from the *end user* (each Apify user passes their own upstream credentials), use Actor input fields - but be aware that Standby Actors don't have batch input. You can read input via query parameters or the MCP `arguments` of each tool call. See the "User-supplied upstream credentials" section below.
 
 ## Adding charging
 
@@ -155,7 +155,7 @@ Add a `credentials` argument to each tool and require the client to send it on e
 
 ### Option 4: Two-step auth (out-of-band)
 
-The Actor exposes a setup tool (`set_credentials`) that stashes the user's credentials in their session (KV Store keyed by Apify user ID derived from the API token). Subsequent calls look up credentials from the session. Most secure; requires session state and a stateful transport — see `transports.md`.
+The Actor exposes a setup tool (`set_credentials`) that stashes the user's credentials in their session (KV Store keyed by Apify user ID derived from the API token). Subsequent calls look up credentials from the session. Most secure; requires session state and a stateful transport - see `transports.md`.
 
 In all cases, log nothing about the user's upstream credentials and redact them from any error messages.
 
@@ -172,7 +172,7 @@ When you hit two or more of these, migrate to Path C. Keep the upstream server a
 
 ## Verification after `apify push`
 
-Same as Path C — see `checklist-publish.md`. Specific to proxies:
+Same as Path C - see `checklist-publish.md`. Specific to proxies:
 
 1. Confirm the child process starts. Check logs for the `MCP_COMMAND` you set; if it crashes (missing npm package, missing env var), the proxy will keep restarting it.
 2. Run `tools/list` via MCP Inspector. The tools should be **exactly** what the upstream MCP server exposes. If you see fewer, something in the proxy is filtering; if you see more, you're connected to the wrong upstream.
